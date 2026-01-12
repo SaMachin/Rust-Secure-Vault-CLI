@@ -1,10 +1,15 @@
 [package]
-name = "secret_manager"
-version = "0.1.0"
+name = "secure-vault-cli"
+version = "1.0.0"
+authors = ["SamuelT"]
 edition = "2024"
+description = "Secrets manager in a CLI"
+repository = "https://github.com/SaMachin/Rust-Secure-Vault-CLI"
+license = "Apache 2.0"
 
 [dependencies]
 aes-gcm = "0.10.3"
+anyhow = "1.0.100"
 argon2 = "0.5.3"
 clap = { version = "4.5.54", features = ["derive"] }
 generic-array = "0.14.7"
@@ -12,3 +17,4 @@ rand = "0.9.2"
 rpassword = "7.4.0"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
+serde_with = { version = "3.16.1", features = ["base64"] }
