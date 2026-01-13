@@ -57,3 +57,31 @@ pub fn decipher(entry: &Entry, password: String) -> anyhow::Result<String> {
         .context("The text is not valid UTF-8")?;
     Ok(text_decipher)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cipher_decipher_cycle() {
+        let text = "Very top secret message !_@#".to_string();
+        let password = "SuperPassword123 !_@#".to_string();
+
+        let entry = cipher(text.clone(), password.clone()).unwrap();
+        let text_decipher = decipher(&entry, password).unwrap();
+
+        assert_eq!(text, text_decipher);
+    }
+
+    #[test]
+    fn test_wrong_password() {
+        let text = "Very top secret message !_@#".to_string();
+        let password = "SuperPassword123 !_@#".to_string();
+        let wrong_password = "superPassword123 !_@#".to_string();
+
+        let entry = cipher(text.clone(), password.clone()).unwrap();
+        let text_decipher = decipher(&entry, wrong_password);
+
+        assert!(text_decipher.is_err());
+    }
+}
