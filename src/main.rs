@@ -6,14 +6,23 @@ use anyhow::{Context, anyhow};
 use clap::Parser;
 use rpassword::prompt_password;
 
-use cli::{Cli, Commands};
+use cli::{Cli, Commands, DEFAULT_PATH};
 use json_vault::{Entry, open_vault, write_vault, add_entry, delete_entry, read_entry};
 use crypto::{cipher, decipher};
+
+fn handle_path(path: String) -> String {
+    if path == DEFAULT_PATH {
+        String::from(DEFAULT_PATH)
+    } else {
+        path
+    }
+}
 
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
-    let mut entries = open_vault()
+    let path = handle_path(cli.path);
+    let mut entries = open_vault(&path)
         .context("Failed to open vault")?;
 
     match &cli.command {
@@ -47,13 +56,13 @@ fn main() -> anyhow::Result<()> {
                 .context("Failed to create a new entry")?;
             add_entry(&mut entries, String::from(label), entry);
             
-            write_vault(entries)
+            write_vault(&path, entries)
                 .context("Failed to save the vault to disk")?;
             println!("Entry '{label}' was successfully saved")
         }
         Commands::Delete { label } => {
             if delete_entry(&mut entries, String::from(label)) {
-                write_vault(entries)
+                write_vault(&path, entries)
                     .context("Failed to save the vault to disk")?;
                 println!("Entry '{label}' was correctly deleted");
             } else {
