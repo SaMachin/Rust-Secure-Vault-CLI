@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::collections::HashMap;
 
 #[serde_as]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Entry {
     #[serde_as(as = "Base64")]
     pub salt: Vec<u8>,
@@ -53,17 +53,55 @@ pub fn read_entry<'a>(entries: &'a HashMap<String, Entry>, label: &String) -> Op
 
 #[cfg(test)]
 mod tests {
-    use std::env::temp_dir;
+    use tempfile::{NamedTempFile, env::temp_dir};
 
     use super::*;
 
     #[test]
     fn test_create_empty_vault() {
         let temp_dir = temp_dir();
-        let path = temp_dir.join("temp_test_vault.json");
+        let path = temp_dir.join("\\temp_test_empty_vault.json");
 
         let empty_vault = open_vault(&path).unwrap();
         
         assert!(empty_vault.is_empty());
+    }
+    
+    #[test]
+    fn test_add_delete_cycle() {
+        let label: String = String::from("Very top secret entry !_@#");
+        let mut entries = HashMap::new();
+        let entry = Entry {
+            salt: "salt".into(),
+            nonce: "nonce".into(),
+            cipher_text: "Very_top_secret_text!_@#".into(),
+        };
+        
+        add_entry(&mut entries, label.clone(), entry);
+
+        assert!(delete_entry(&mut entries, label), "Failed to delete the entry");
+        assert!(entries.is_empty(), "'Entries' was not empty after deletion");
+    }
+
+    #[test]
+    fn test_write_read_cycle() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        let label: String = String::from("Very top secret entry !_@#");
+        let mut entries = open_vault(&path).unwrap();
+        let entry = Entry {
+            salt: "salt".into(),
+            nonce: "nonce".into(),
+            cipher_text: "Very_top_secret_text!_@#".into(),
+        };
+
+        add_entry(&mut entries, label.clone(), entry.clone());
+        write_vault(path.clone(), entries.clone()).unwrap();
+
+        let entries_disk = open_vault(&path).unwrap();
+        let entry_read = read_entry(&entries_disk, &label).unwrap();
+        
+        assert_eq!(entry.cipher_text, entry_read.cipher_text);
     }
 }
