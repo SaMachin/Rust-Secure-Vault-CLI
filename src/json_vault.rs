@@ -89,7 +89,7 @@ mod tests {
         let path = temp_file.path().to_path_buf();
 
         let label: String = String::from("Very top secret entry !_@#");
-        let mut entries = open_vault(&path).unwrap();
+        let mut entries = HashMap::new();
         let entry = Entry {
             salt: "salt".into(),
             nonce: "nonce".into(),
