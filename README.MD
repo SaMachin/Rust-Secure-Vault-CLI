@@ -25,16 +25,16 @@ Un gestionnaire de secrets en ligne de commande (CLI) écrit en Rust. Ce projet 
 #### **Ajouter une entrée**  
 Dans le cas où l'entrée existe déjà, le programme va afficher un avertissement et demander une confirmation avant d'écraser l'entrée déjà existante.
 ```
-add <label>
+add <label> [-p|--path <path>]
 ```
 #### **Lire une entrée**
 ```
-read <label>
+read <label> [-p|--path <path>]
 ```
 #### **Supprimer une entrée**
 Contrairement aux autres commandes, delete ne requiert pas le mot de passe fourni lors de la création de l'entrée, étant donné que les secrets sont enregistrés localement sur le disque. Ainsi, il est très facile de directement supprimer le fichier de secrets sans passer le terminal. Par conséquent, demander le mot de passe avant de supprimer une entrée serait une "couche de sécurité" placebo.
 ```
-delete <label>
+delete <label> [-p|--path <path>]
 ```
 #### **Message d'aide**
 ```
