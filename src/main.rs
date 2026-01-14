@@ -4,17 +4,18 @@ mod crypto;
 
 use anyhow::{Context, anyhow};
 use clap::Parser;
+use std::path::PathBuf;
 use rpassword::prompt_password;
 
 use cli::{Cli, Commands, DEFAULT_PATH};
 use json_vault::{Entry, open_vault, write_vault, add_entry, delete_entry, read_entry};
 use crypto::{cipher, decipher};
 
-fn handle_path(path: String) -> String {
+fn handle_path(path: String) -> PathBuf {
     if path == DEFAULT_PATH {
-        String::from(DEFAULT_PATH)
+        PathBuf::from(DEFAULT_PATH)
     } else {
-        path
+        PathBuf::from(&path)
     }
 }
 
@@ -56,13 +57,13 @@ fn main() -> anyhow::Result<()> {
                 .context("Failed to create a new entry")?;
             add_entry(&mut entries, String::from(label), entry);
             
-            write_vault(&path, entries)
+            write_vault(path, entries)
                 .context("Failed to save the vault to disk")?;
             println!("Entry '{label}' was successfully saved")
         }
         Commands::Delete { label } => {
             if delete_entry(&mut entries, String::from(label)) {
-                write_vault(&path, entries)
+                write_vault(path, entries)
                     .context("Failed to save the vault to disk")?;
                 println!("Entry '{label}' was correctly deleted");
             } else {
