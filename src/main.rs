@@ -62,6 +62,10 @@ fn main() -> anyhow::Result<()> {
             println!("Entry '{label}' was successfully saved")
         }
         Commands::Delete { label } => {
+            if !&path.exists() {
+                return Err(anyhow!("Failed to delete entry '{label}', because no vault file was found at path: {path:?}"));
+            }
+
             if delete_entry(&mut entries, String::from(label)) {
                 write_vault(path, entries)
                     .context("Failed to save the vault to disk")?;
@@ -71,6 +75,10 @@ fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Read { label } => {
+            if !path.exists() {
+                return Err(anyhow!("Failed to read entry '{label}', because no vault file was found at path: {path:?}"));
+            }
+
             let Some(entry) = read_entry(&entries, &label) else {
                 return Err(anyhow!("Entry '{label}' does not exists, nothing to read"));
             };
