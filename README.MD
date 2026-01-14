@@ -57,8 +57,6 @@ help [command]
 
 - **Multi-notes** : Permettre d'avoir plus d'un message par entrée.
 
-- **Support multi-vault** : Permettre la création et la gestion de plusieurs fichiers de coffre-fort indépendants.
-
 ## Ce que j'ai appris
 - **Authenticité (AEAD)** : Utilisation d'AES-256-GCM pour garantir que les secrets n'ont pas été altérés ou corrompus sur le disque.
 
