@@ -31,6 +31,9 @@ pub fn open_vault(path: &PathBuf) -> anyhow::Result<HashMap<String, Entry>> {
 pub fn write_vault(path: PathBuf, entries: HashMap<String, Entry>) -> anyhow::Result<()> {
     let json_string = serde_json::to_string_pretty(&entries)
         .context("Failed to serialize the vault entries")?;
+
+    if !path.exists() { println!("No vault at the path {path:?} exists, a new vault is going to be created") }
+
     fs::write(path, json_string)
         .context("Failed to save the vault file to disk")?;
     Ok(())
