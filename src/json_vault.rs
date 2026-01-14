@@ -2,8 +2,10 @@ use anyhow::Context;
 use serde::{Serialize, Deserialize};
 use serde_with::{serde_as, base64::Base64};
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 use std::collections::HashMap;
+
+const PATH: &str = "vault.json";
 
 #[serde_as]
 #[derive(Serialize, Deserialize, Debug)]
@@ -16,9 +18,10 @@ pub struct Entry {
     pub cipher_text: Vec<u8>,
 }
 
-pub fn open_vault(path: &PathBuf) -> anyhow::Result<HashMap<String, Entry>> {
+pub fn open_vault() -> anyhow::Result<HashMap<String, Entry>> {
+    let path = Path::new(PATH);
     if path.exists() {
-        let file_content = fs::read_to_string(&path)
+        let file_content = fs::read_to_string(&PATH)
             .context("Failed to read the vault file")?;
         let entries = serde_json::from_str(&file_content)
             .context("Vault file is corrupted or is not valid JSON")?;
@@ -28,13 +31,10 @@ pub fn open_vault(path: &PathBuf) -> anyhow::Result<HashMap<String, Entry>> {
     }
 }
 
-pub fn write_vault(path: PathBuf, entries: HashMap<String, Entry>) -> anyhow::Result<()> {
+pub fn write_vault(entries: HashMap<String, Entry>) -> anyhow::Result<()> {
     let json_string = serde_json::to_string_pretty(&entries)
         .context("Failed to serialize the vault entries")?;
-
-    if !path.exists() { println!("No vault at the path {path:?} exists, a new vault is going to be created") }
-
-    fs::write(path, json_string)
+    fs::write(&PATH, json_string)
         .context("Failed to save the vault file to disk")?;
     Ok(())
 }
