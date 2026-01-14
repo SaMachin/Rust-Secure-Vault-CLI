@@ -2,7 +2,7 @@ use anyhow::Context;
 use serde::{Serialize, Deserialize};
 use serde_with::{serde_as, base64::Base64};
 use std::fs;
-use std::path::Path;
+use std::path::PathBuf;
 use std::collections::HashMap;
 
 #[serde_as]
@@ -16,8 +16,7 @@ pub struct Entry {
     pub cipher_text: Vec<u8>,
 }
 
-pub fn open_vault(path: &String) -> anyhow::Result<HashMap<String, Entry>> {
-    let path = Path::new(&path);
+pub fn open_vault(path: &PathBuf) -> anyhow::Result<HashMap<String, Entry>> {
     if path.exists() {
         let file_content = fs::read_to_string(&path)
             .context("Failed to read the vault file")?;
@@ -29,7 +28,7 @@ pub fn open_vault(path: &String) -> anyhow::Result<HashMap<String, Entry>> {
     }
 }
 
-pub fn write_vault(path: &String, entries: HashMap<String, Entry>) -> anyhow::Result<()> {
+pub fn write_vault(path: PathBuf, entries: HashMap<String, Entry>) -> anyhow::Result<()> {
     let json_string = serde_json::to_string_pretty(&entries)
         .context("Failed to serialize the vault entries")?;
     fs::write(path, json_string)
