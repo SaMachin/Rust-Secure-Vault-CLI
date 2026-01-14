@@ -48,3 +48,21 @@ pub fn delete_entry(entries: &mut HashMap<String, Entry>, label: String) -> bool
 pub fn read_entry<'a>(entries: &'a HashMap<String, Entry>, label: &String) -> Option<&'a Entry> {
     entries.get(label)
 }
+
+#[cfg(test)]
+mod tests {
+    use std::env::temp_dir;
+
+    use super::*;
+
+    #[test]
+    fn test_create_empty_vault() {
+        let temp_dir = temp_dir();
+        let path = temp_dir.join("temp_test_vault.json");
+        let path_string: String = String::from(path.to_str().unwrap());
+
+        let empty_vault = open_vault(&path_string).unwrap();
+        
+        assert!(empty_vault.is_empty());
+    }
+}
